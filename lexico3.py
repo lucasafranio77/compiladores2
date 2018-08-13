@@ -29,7 +29,6 @@ def comentario1():
         while pegartoken() != '}':
             i += 1
         i += 1
-        print('Acabou o teu comentario { .... }')
         return True
     else:
         return False
@@ -41,12 +40,10 @@ def comentario2():
         i += 1
         if pegartoken() == '*':
             i += 1
-            print('--- Inicio do comentario2 ---')
             while pegartoken() != "*":
                 i += 1
             final_comentario2()
         else:
-            print("Simbolo simples: /")
             tokens.append("/ SimbolosSimples " + str(linha) + ' \n')
             return True
     else:
@@ -58,7 +55,6 @@ def final_comentario2():
         i += 1
         if pegartoken() == '/':
             i += 1
-            print("--- Fim do comentário 2 ---")
             return True
         else:
             while pegartoken() != "*":
@@ -79,11 +75,9 @@ def ident_num():
             i += 1
             aux = str(pegartoken())
         if palavra in p_reservada:
-            print(palavra, ' eh uma palavra reservada')
             tokens.append(palavra + " PalavraReservada " + str(linha) + " \n")
             return True
         else:
-            print(palavra, ' eh um identificador ')
             tokens.append(palavra + " Identificador " + str(linha) + " \n")
             return True
     elif aux.isdigit():
@@ -106,13 +100,11 @@ def ident_num():
                     palavra = palavra + str(pegartoken())
                     i += 1
                     aux = str(pegartoken())
-                print(palavra, ' eh numero real')
                 tokens.append(palavra + " NumeroReal " + str(linha) + " \n")
                 return True
             else:
                 return False
         else:
-            print(palavra, ' eh um numero inteiro')
             tokens.append(palavra + " NumeroInteiro " + str(linha)  + " \n")
             return True
     else:
@@ -126,12 +118,10 @@ def simbolos():
         i += 1
         buff = aux + str(pegartoken())
         if str(pegartoken()) in simbolos_simples and buff in simbolos_duplos:
-            print(buff, ' eh simbolo duplo')
             tokens.append(buff + " SimbolosDuplos " + str(linha) + ' \n')
             i += 1
             return True
         else:
-            print(aux, ' eh simbolo simples')
             tokens.append(aux + " SimbolosSimples " + str(linha) + ' \n')
             return True
     else:
@@ -146,7 +136,7 @@ def lexico():
     
     saida.writelines(tokens)
 
-arquivo=open("entrada_errada.txt", "r")
+arquivo=open("entrada_certa.txt", "r")
 entrada=arquivo.read()
 
 saida=open("tokens.txt", "w")
