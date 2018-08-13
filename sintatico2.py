@@ -31,17 +31,16 @@ def programa():
                     token = proxToken()
                     return True
                 else:
-                    print('erro no . final ')
+                    print('erro: está faltando o token . na linha ', token[2])
                     return False
             else:
                 print('erro ao ir no corpo')
-                #print('\nErro no token, ', token)
                 return False
         else:
-            print('erro no identificador do programa')
+            print("erro: está faltando o token ident na linha ", token[2])
             return False
     else:
-        print('erro no programa')
+        print("erro: está faltando o token program na linha ", token[2])
         return False
 
 def corpo():
@@ -56,13 +55,13 @@ def corpo():
                     token = proxToken()
                     return True
                 else:
-                    print("erro no end")
+                    print("erro: está faltando o token end na linha ", token[2])
                     return False
             else:
                 print("erro ao ir para comandos")
                 return False
         else:
-            print("erro no begin")
+            print("erro: está faltando o token begin na linha ", token[2])
             return False
     else:
         print("erro ao ir para dc")
@@ -99,6 +98,7 @@ def mais_dc():
             print("erro no dc do mais_dc")
             return False
     else:
+        print("erro: está faltando o token ; na linha ", token[2])
         print("ok no mais_dc vazio")
         return True
 
@@ -118,7 +118,7 @@ def dc_v():
                     print("erro no tipo_var")
                     return False
             else:
-                print("erro no :")
+                print("erro: está faltando o token : na linha ", token[2])
                 return False
         else:
             print("erro ao voltar das variaveis")
@@ -152,7 +152,7 @@ def variaveis():
             print("erro no mais_var")
             return False
     else:
-        print("erro no identificador da variaveis")
+        print("erro: está faltando o token ident na linha ", token[2])
         return False
 
 def mais_var():
@@ -168,6 +168,7 @@ def mais_var():
             return False
     else:
         print("ok no mais_var vazio")
+        print("erro: está faltando o token , na linha ", token[2])
         return True
 
 def dc_p():
@@ -190,9 +191,11 @@ def dc_p():
                 return False
         else:
             print("erro no identificador do dc_p")
+            print("erro: está faltando o token ident na linha ", token[2])
             return False
     else:
         print("erro procedure no dc_p")
+        print("erro: está faltando o token procedure na linha ", token[2])
         return False
 
 def parametros():
@@ -206,13 +209,14 @@ def parametros():
                 token = proxToken()
                 return True
             else:
-                print("erro )")
+                print("erro: está faltando o token ) na linha ", token[2])
                 return False
         else:
             print("erro no lista par")
             return False
     else:
         print("ok parametros vazio")
+        print("erro: está faltando o token ( na linha ", token[2])
         return True
 
 def lista_par():
@@ -232,7 +236,7 @@ def lista_par():
                 print("erro no tipo_var")
                 return False
         else:
-            print("erro :")
+            print("erro: está faltando o token : na linha ", token[2])
             return False
     else:
         print("erro variaveis")
@@ -251,6 +255,7 @@ def mais_par():
             return False
     else:
         print("ok mais_par vazio")
+        print("erro: está faltando o token ; na linha ", token[2])
         return True
 
 def corpo_p():
@@ -266,12 +271,14 @@ def corpo_p():
                     return True
                 else:
                     print("erro end do corpo_p")
+                    print("erro: está faltando o token end na linha ", token[2])
                     return False
             else:
                 print("erro no comandos")
                 return False
         else:
             print("erro begin do corpo_p")
+            print("erro: está faltando o token begin na linha ", token[2])
             return False
     else:
         print("erro dc_loc no corpo_p")
@@ -302,6 +309,7 @@ def mais_dcloc():
             print("erro dc_loc no mais_dcloc")
     else:
         print("ok mais_dcloc vazio")
+        print("erro: está faltando o token ; na linha ", token[2])
         return True
 
 def lista_arg():
@@ -316,12 +324,14 @@ def lista_arg():
                 return True
             else:
                 print("erro ) na lista_arg")
+                print("erro: está faltando o token ) na linha ", token[2])
                 return False
         else:
             print('erro argumentos no lista_arg')
             return False
     else:
         print("ok lista_arg vazio")
+        print("erro: está faltando o token ( na linha ", token[2])
         return True
 
 def argumentos():
@@ -337,6 +347,7 @@ def argumentos():
             return False
     else:
         print("erro no identificador do argumentos")
+        print("erro: está faltando o token ident na linha ", token[2])
         return False
 
 def mais_ident():
@@ -352,6 +363,7 @@ def mais_ident():
             return False
     else:
         print("ok mais_ident vazio")
+        print("erro: está faltando o token ; na linha ", token[2])
         return True
 
 def pfalsa():
@@ -367,6 +379,7 @@ def pfalsa():
             return False
     else:
         print("ok pfalsa vazio")
+        print("erro: está faltando o token else na linha ", token[2])
         return True
 
 def comandos():
@@ -384,10 +397,6 @@ def comandos():
 
 # TODO: Add "erro: faltando token esperado" nos terminais da gramática
 
-# TODO: Identificar todos os pontos aonde os erros são possiveis de acontecer
-
-# FIXME: + TODO: melhorar mensagens de erros
-
 def mais_comandos():
     global token
     if ";" in token:
@@ -401,6 +410,7 @@ def mais_comandos():
             return False
     else:
         print("ok mais_comandos vazio")
+        print("erro: está faltando o token ; na linha ",token[2])
         return True
 
 def comando():
@@ -411,7 +421,6 @@ def comando():
         if "(" in token:
             print("ok ( no comando")
             token = proxToken()
-            print(token)
             if variaveis():
                 if ")" in token:
                     print("ok ) no comando")
@@ -419,12 +428,14 @@ def comando():
                     return True
                 else:
                     print("erro ) no comando")
+                    print("erro: está faltando o token ) na linha ", token[2])
                     return False
             else:
                 print("erro variaveis no comando")
                 return False
         else:
             print("erro ( no comando")
+            print("erro: está faltando o token ( na linha ", token[2])
             return False
     elif "write" in token:
         print("ok write no comando")
@@ -439,12 +450,14 @@ def comando():
                     return True
                 else:
                     print("erro ) no comando")
+                    print("erro: está faltando o token ) na linha ", token[2])
                     return False
             else:
                 print("erro variaveis no comando")
                 return False
         else:
             print("erro ( no comando")
+            print("erro: está faltando o token ( na linha ", token[2])
             return False
     elif "while" in token:
         print("ok while no comando")
@@ -460,12 +473,14 @@ def comando():
                         return True
                     else:
                         print("erro $ no comando")
+                        print("erro: está faltando o token $ na linha ", token[2])
                         return True
                 else:
                     print("erro while > do no comando")
                     return False
             else:
                 print("erro - nao achei do na condicao")
+                print("erro: está faltando o token do na linha ", token[2])
                 return False
         else:
             print("erro na condicao do while")
@@ -485,6 +500,7 @@ def comando():
                             return True
                         else:
                             print("erro $ then da condicao")
+                            print("erro: está faltando o token $ na linha ", token[2])
                             return False
                     else:
                         print("erro pfalsa > then da condicao")
@@ -494,6 +510,7 @@ def comando():
                     return False
             else:
                 print("erro then no comando")
+                print("erro: está faltando o token then na linha ", token[2])
                 return False
         else:
             print("erro na condicao > if no comando")
@@ -509,6 +526,7 @@ def comando():
             return False
     else:
         print("erro no comando")
+        print("erro: está faltando o token ident na linha ", token[2])
         return False
 
 def restoIdent():
@@ -527,16 +545,15 @@ def restoIdent():
         return True
     else:
         print("erro no restoIdent")
+        print("erro: está faltando o token := na linha ", token[2])
         return False
 
 def condicao():
     global token
     exp1 = token
-    print(exp1, "token da condicao")
     if expressao():
         if relacao():
             exp2 = token
-            print(exp2,"token da exp")
             if expressao():
                 print("ok expressao na condicao")
                 return True
@@ -578,6 +595,7 @@ def relacao():
         return True
     else:
         print("erro no op_un")
+        print("erro: está faltando o token = ou <> ou >= ou <= ou < ou > na linha ", token[2])
         return False
 
 def expressao():
@@ -605,6 +623,7 @@ def op_un():
         return True
     else:
         print("ok na op_un vazio")
+        print("erro: está faltando o token + ou - na linha ", token[2])
         return True
 
 def outros_termos():
@@ -636,6 +655,7 @@ def op_ad():
         return True
     else:
         print("erro no op_ad")
+        print("erro: está faltando o token + ou -  na linha ", token[2])
         return False
 
 def termo():
@@ -685,6 +705,7 @@ def op_mul():
         return True
     else:
         print("erro no op_mul")
+        print("erro: está faltando o token * ou / na linha ", token[2])
         return False
 
 def fator():
@@ -711,12 +732,14 @@ def fator():
                 return True
             else:
                 print("erro ) no fator")
+                print("erro: está faltando o token ) na linha ", token[2])
                 return False
         else:
             print("erro expressao no fator")
             return False
     else:
         print("erro fator")
+        print("erro: está faltando o token ( ou ident ou numero_int ou numero_real na linha ", token[2])
         return False
 
 token = proxToken()
