@@ -435,11 +435,8 @@ def restoIdent():
         return False
 
 def condicao():
-    global token
-    exp1 = token
     if expressao():
         if relacao():
-            exp2 = token
             if expressao():
                 return True
             else:
