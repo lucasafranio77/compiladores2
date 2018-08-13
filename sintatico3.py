@@ -13,7 +13,9 @@ def proxToken():
 def S():
     global token
     if token:
-        programa()
+        if programa():
+            print("\nParabéns programador, o seu código está sintaticamente correto!")
+            return True
     else:
         return False
 
@@ -25,7 +27,6 @@ def programa():
             token = proxToken()
             if corpo():
                 if "." in token:
-                    print('ok . \n \nParabéns programador, o seu código está sintaticamente correto!')
                     token = proxToken()
                     return True
                 else:
@@ -102,6 +103,7 @@ def dc_v():
         else:
             return False
     else:
+        print("erro: está faltando o token var na linha ", token[2])
         return False
 
 def tipo_var():
@@ -113,6 +115,7 @@ def tipo_var():
         token = proxToken()
         return True
     else:
+        print("erro: está faltando o token real ou integer na linha ", token[2])
         return False
 
 def variaveis():
@@ -416,7 +419,7 @@ def comando():
             return False
     else:
         print("erro no comando")
-        print("erro: está faltando o token ident na linha ", token[2])
+        print("erro: está faltando o token read ou write ou while ou if ou ident na linha ", token[2])
         return False
 
 def restoIdent():
@@ -503,6 +506,7 @@ def outros_termos():
         else:
             return False
     else:
+        print("retornando vazio nos outros_termos")
         return True
 
 def op_ad():
@@ -515,7 +519,7 @@ def op_ad():
         return True
     else:
         print("erro no op_ad")
-        print("erro: está faltando o token + ou -  na linha ", token[2])
+        print("erro: está faltando o token + ou - na linha ", token[2])
         return False
 
 def termo():
@@ -542,6 +546,7 @@ def mais_fatores():
         else:
             return False
     else:
+        print("retornando vazio nos mais_fatores")
         return True
 
 def op_mul():

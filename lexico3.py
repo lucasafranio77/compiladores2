@@ -131,8 +131,9 @@ def lexico():
     global tokens, saida, linha
     while i < len(entrada):
         if ( comentario1() or comentario2() or tira_espaco() or ident_num() or simbolos() ) != True:
-            print("Erro lexico !! na linha " + str(linha) + " no token" + str(pegartoken()) + "\n")
+            print("\nErro lexico !! na linha " + str(linha) + " no token " + str(pegartoken()) + "\n")
             return False
+    print("\nParabéns programador, o seu código está lexicamente correto! \n")
     
     saida.writelines(tokens)
 
