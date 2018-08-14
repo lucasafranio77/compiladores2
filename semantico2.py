@@ -10,22 +10,46 @@ from types import SimpleNamespace
 
 # caso seja cat="param", insere os parametros e variaveis no ultimo proc
 
-#insere variaveis na tabela de simbolos
+# insere variaveis na tabela de simbolos
 
-class Tabela_Simbolos:
-    def __init__(self,cadeia,token,categoria,tipo, linha, escopo, valor):
+
+class Atributos:
+    def __init__(self, cadeia, token, categoria, tipo, valor, linha, escopo, ):
         self.cadeia = cadeia
         self.token = token
         self.categoria = categoria
         self.tipo = tipo
+        self.valor = valor
         self.linha = linha
         self.escopo = escopo
-        self.valor = valor
+    
+    def __repr__(self):
+        return "[{}, {}, {}, {}, {}, {}, {}]".format(self.cadeia, self.token, self.categoria, self.tipo, self.valor, self.linha, self.escopo)
+
+tabela_simbolos = list()
+cat = ""
+
+def insere_var(Lex):
+    global tabela_simbolos, cat
+    tabela_simbolos.append(Atributos(token[0],token[1],cat,'-','-',token[2],'-'))
+    print('\n------- Tabela de Simbolos ------- \n', tabela_simbolos,'\n')
+
+def insere_tipo(tipo, cont):
+    global tabela_simbolos
+    tam = len(tabela_simbolos)
+    print("tamanho é ",tam)
+    print(cont)
+    while cont > 0:
+        print('entrei para fazer a inserção do tipo')
+        tabela_simbolos[tam-cont].tipo = tipo[0]
+        cont -= 1
+        print(cont)
+
 
 def proxToken():
     global tokens
     if tokens:
-        prox = tokens.pop(0)
+        prox=tokens.pop(0)
         return prox.split(' ')
 
 def S():
@@ -38,18 +62,23 @@ def S():
         return False
 
 def programa():
-    global token
+    global token, cat
     if "program" in token:
-        token = proxToken()
-
-        item1 = Tabela_Simbolos(token[0],token[1],"var","inteiro",token[2],"local",0)
-        print(item1.cadeia)
+        token=proxToken()
+        cat = "nome_prog"
+        # testando lista com objetos e acessando eles
+        '''Tabela_Simbolos.append(Atributos(token[0],token[1],"var","inteiro",token[2],"local",0))
+        Tabela_Simbolos.append(Atributos(token[0],token[1],"var","inteiro",token[2],"local",6))
+        print(Tabela_Simbolos)
+        print(Tabela_Simbolos[1])
+        print(Tabela_Simbolos[1].cadeia)'''
 
         if "Identificador" in token:
-            token = proxToken()
+            insere_var(token)
+            token=proxToken()
             if corpo():
                 if "." in token:
-                    token = proxToken()
+                    token=proxToken()
                     return True
                 else:
                     print('erro: está faltando o token . na linha ', token[2])
@@ -67,13 +96,14 @@ def corpo():
     global token
     if dc():
         if "begin" in token:
-            token = proxToken()
+            token=proxToken()
             if comandos():
                 if "end" in token:
-                    token = proxToken()
+                    token=proxToken()
                     return True
                 else:
-                    print("erro: está faltando o token end na linha ", token[2])
+                    print(
+                        "erro: está faltando o token end na linha ", token[2])
                     return False
             else:
                 return False
@@ -100,7 +130,7 @@ def dc():
 def mais_dc():
     global token
     if ";" in token:
-        token = proxToken()
+        token=proxToken()
         if dc():
             return True
         else:
@@ -109,12 +139,14 @@ def mais_dc():
         return True
 
 def dc_v():
-    global token
+    global token,cat, cont_id
     if "var" in token:
-        token = proxToken()
+        cat = "var"
+        cont_id = 1
+        token=proxToken()
         if variaveis():
             if ":" in token:
-                token = proxToken()
+                token=proxToken()
                 if tipo_var():
                     return True
                 else:
@@ -129,21 +161,25 @@ def dc_v():
         return False
 
 def tipo_var():
-    global token
+    global token, cont_id
     if "real" in token:
-        token = proxToken()
+        insere_tipo(token, cont_id)
+        token=proxToken()
         return True
     elif "integer" in token:
-        token = proxToken()
+        insere_tipo(token, cont_id)
+        token=proxToken()
         return True
     else:
-        print("erro: está faltando o token real ou integer na linha ", token[2])
+        print(
+            "erro: está faltando o token real ou integer na linha ", token[2])
         return False
 
 def variaveis():
     global token
     if "Identificador" in token:
-        token = proxToken()
+        insere_var(token)
+        token=proxToken()
         if mais_var():
             return True
         else:
@@ -153,9 +189,10 @@ def variaveis():
         return False
 
 def mais_var():
-    global token
+    global token, cont_id
     if "," in token:
-        token = proxToken()
+        cont_id += 1
+        token=proxToken()
         if variaveis():
             return True
         else:
@@ -164,11 +201,13 @@ def mais_var():
         return True
 
 def dc_p():
-    global token
+    global token, cat
     if "procedure" in token:
-        token = proxToken()
+        cat = "proc"
+        token=proxToken()
         if "Identificador" in token:
-            token = proxToken()
+            insere_var(token)
+            token=proxToken()
             if parametros():
                 if corpo_p():
                     return True
@@ -186,12 +225,13 @@ def dc_p():
         return False
 
 def parametros():
-    global token
+    global token, cat
     if "(" in token:
-        token = proxToken()
+        cat = "param"
+        token=proxToken()
         if lista_par():
             if ")" in token:
-                token = proxToken()
+                token=proxToken()
                 return True
             else:
                 print("erro: está faltando o token ) na linha ", token[2])
@@ -202,10 +242,11 @@ def parametros():
         return True
 
 def lista_par():
-    global token
+    global token, cont_id
+    cont_id = 1
     if variaveis():
         if ":" in token:
-            token = proxToken()
+            token=proxToken()
             if tipo_var():
                 if mais_par():
                     return True
@@ -222,7 +263,7 @@ def lista_par():
 def mais_par():
     global token
     if ";" in token:
-        token = proxToken()
+        token=proxToken()
         if lista_par():
             return True
         else:
@@ -234,14 +275,15 @@ def corpo_p():
     global token
     if dc_loc():
         if "begin" in token:
-            token = proxToken()
+            token=proxToken()
             if comandos():
                 if "end" in token:
-                    token = proxToken()
+                    token=proxToken()
                     return True
                 else:
                     print("erro end do corpo_p")
-                    print("erro: está faltando o token end na linha ", token[2])
+                    print(
+                        "erro: está faltando o token end na linha ", token[2])
                     return False
             else:
                 return False
@@ -265,7 +307,7 @@ def dc_loc():
 def mais_dcloc():
     global token
     if ";" in token:
-        token = proxToken()
+        token=proxToken()
         if dc_loc():
             return True
     else:
@@ -274,10 +316,10 @@ def mais_dcloc():
 def lista_arg():
     global token
     if "(" in token:
-        token = proxToken()
+        token=proxToken()
         if argumentos():
             if ")" in token:
-                token = proxToken()
+                token=proxToken()
                 return True
             else:
                 print("erro ) na lista_arg")
@@ -291,7 +333,7 @@ def lista_arg():
 def argumentos():
     global token
     if "Identificador" in token:
-        token = proxToken()
+        token=proxToken()
         if mais_ident():
             return True
         else:
@@ -304,7 +346,7 @@ def argumentos():
 def mais_ident():
     global token
     if ";" in token:
-        token = proxToken()
+        token=proxToken()
         if argumentos():
             return True
         else:
@@ -315,7 +357,7 @@ def mais_ident():
 def pfalsa():
     global token
     if "else" in token:
-        token = proxToken()
+        token=proxToken()
         if comandos():
             return True
         else:
@@ -342,7 +384,7 @@ def comandos():
 def mais_comandos():
     global token
     if ";" in token:
-        token = proxToken()
+        token=proxToken()
         if comandos():
             return True
         else:
@@ -353,12 +395,12 @@ def mais_comandos():
 def comando():
     global token
     if "read" in token:
-        token = proxToken()
+        token=proxToken()
         if "(" in token:
-            token = proxToken()
+            token=proxToken()
             if variaveis():
                 if ")" in token:
-                    token = proxToken()
+                    token=proxToken()
                     return True
                 else:
                     print("erro ) no comando")
@@ -371,12 +413,12 @@ def comando():
             print("erro: está faltando o token ( na linha ", token[2])
             return False
     elif "write" in token:
-        token = proxToken()
+        token=proxToken()
         if "(" in token:
-            token = proxToken()
+            token=proxToken()
             if variaveis():
                 if ")" in token:
-                    token = proxToken()
+                    token=proxToken()
                     return True
                 else:
                     print("erro ) no comando")
@@ -389,17 +431,18 @@ def comando():
             print("erro: está faltando o token ( na linha ", token[2])
             return False
     elif "while" in token:
-        token = proxToken()
+        token=proxToken()
         if condicao():
             if "do" in token:
-                token = proxToken()
+                token=proxToken()
                 if comandos():
                     if "$" in token:
-                        token = proxToken()
+                        token=proxToken()
                         return True
                     else:
                         print("erro $ no comando")
-                        print("erro: está faltando o token $ na linha ", token[2])
+                        print(
+                            "erro: está faltando o token $ na linha ", token[2])
                         return True
                 else:
                     return False
@@ -410,18 +453,19 @@ def comando():
         else:
             return False
     elif "if" in token:
-        token = proxToken()
+        token=proxToken()
         if condicao():
             if "then" in token:
-                token = proxToken()
+                token=proxToken()
                 if comandos():
                     if pfalsa():
                         if "$" in token:
-                            token = proxToken()
+                            token=proxToken()
                             return True
                         else:
                             print("erro $ then da condicao")
-                            print("erro: está faltando o token $ na linha ", token[2])
+                            print(
+                                "erro: está faltando o token $ na linha ", token[2])
                             return False
                     else:
                         return False
@@ -434,20 +478,21 @@ def comando():
         else:
             return False
     elif "Identificador" in token:
-        token = proxToken()
+        token=proxToken()
         if restoIdent():
             return True
         else:
             return False
     else:
         print("erro no comando")
-        print("erro: está faltando o token read ou write ou while ou if ou ident na linha ", token[2])
+        print(
+            "erro: está faltando o token read ou write ou while ou if ou ident na linha ", token[2])
         return False
 
 def restoIdent():
     global token
     if ":=" in token:
-        token = proxToken()
+        token=proxToken()
         if expressao():
             return True
         else:
@@ -474,26 +519,27 @@ def condicao():
 def relacao():
     global token
     if "=" in token:
-        token = proxToken()
+        token=proxToken()
         return True
     elif "<>" in token:
-        token = proxToken()
+        token=proxToken()
         return True
     elif ">=" in token:
-        token = proxToken()
+        token=proxToken()
         return True
     elif "<=" in token:
-        token = proxToken()
+        token=proxToken()
         return True
     elif ">" in token:
-        token = proxToken()
+        token=proxToken()
         return True
     elif "<" in token:
-        token = proxToken()
+        token=proxToken()
         return True
     else:
         print("erro no op_un")
-        print("erro: está faltando o token = ou <> ou >= ou <= ou < ou > na linha ", token[2])
+        print(
+            "erro: está faltando o token = ou <> ou >= ou <= ou < ou > na linha ", token[2])
         return False
 
 def expressao():
@@ -509,10 +555,10 @@ def expressao():
 def op_un():
     global token
     if "+" in token:
-        token = proxToken()
+        token=proxToken()
         return True
     elif "-" in token:
-        token = proxToken()
+        token=proxToken()
         return True
     else:
         return True
@@ -534,10 +580,10 @@ def outros_termos():
 def op_ad():
     global token
     if "+" in token:
-        token = proxToken()
+        token=proxToken()
         return True
     elif "-" in token:
-        token = proxToken()
+        token=proxToken()
         return True
     else:
         print("erro no op_ad")
@@ -574,10 +620,10 @@ def mais_fatores():
 def op_mul():
     global token
     if "*" in token:
-        token = proxToken()
+        token=proxToken()
         return True
     elif "/" in token:
-        token = proxToken()
+        token=proxToken()
         return True
     else:
         print("erro no op_mul")
@@ -587,19 +633,19 @@ def op_mul():
 def fator():
     global token
     if "Identificador" in token:
-        token = proxToken()
+        token=proxToken()
         return True
     elif "NumeroInteiro" in token:
-        token = proxToken()
+        token=proxToken()
         return True
     elif "NumeroReal" in token:
-        token = proxToken()
+        token=proxToken()
         return True
     elif "(" in token:
-        token = proxToken()
+        token=proxToken()
         if expressao():
             if ")" in token:
-                token = proxToken()
+                token=proxToken()
                 return True
             else:
                 print("erro ) no fator")
@@ -609,8 +655,11 @@ def fator():
             return False
     else:
         print("erro fator")
-        print("erro: está faltando o token ( ou ident ou numero_int ou numero_real na linha ", token[2])
+        print(
+            "erro: está faltando o token ( ou ident ou numero_int ou numero_real na linha ", token[2])
         return False
 
-token = proxToken()
+token=proxToken()
 S()
+
+print(tabela_simbolos)
