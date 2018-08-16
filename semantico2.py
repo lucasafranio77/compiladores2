@@ -5,13 +5,10 @@
 from lexico3 import tokens
 from types import SimpleNamespace
 
-# A tabela de simbolos
-# [cadeia, token, categoria, tipo, valor, linha]
+# Esses são os atributos da tabela de simbolos
+# [cadeia, token, categoria, tipo, valor, linha, escopo]
 
 # caso seja cat="param", insere os parametros e variaveis no ultimo proc
-
-# insere variaveis na tabela de simbolos
-
 
 class Atributos:
     def __init__(self, cadeia, token, categoria, tipo, valor, linha, escopo, ):
@@ -28,23 +25,35 @@ class Atributos:
 
 tabela_simbolos = list()
 cat = ""
+escopo = ""
 
-def insere_var(Lex):
-    global tabela_simbolos, cat
-    tabela_simbolos.append(Atributos(token[0],token[1],cat,'-','-',token[2],'-'))
-    print('\n------- Tabela de Simbolos ------- \n', tabela_simbolos,'\n')
+# insere variaveis na tabela de simbolos
+def insere_var(lex):
+    global tabela_simbolos, cat, escopo
+    if not busca(lex[0]):
+        tabela_simbolos.append(Atributos(token[0],token[1],cat,'-','-',token[2],escopo))
+        print('\n------- Tabela de Simbolos ------- \n', tabela_simbolos,'\n')
 
 def insere_tipo(tipo, cont):
     global tabela_simbolos
     tam = len(tabela_simbolos)
-    print("tamanho é ",tam)
-    print(cont)
     while cont > 0:
-        print('entrei para fazer a inserção do tipo')
         tabela_simbolos[tam-cont].tipo = tipo[0]
         cont -= 1
-        print(cont)
 
+def busca(lex):
+    global tabela_simbolos
+    print("tamanho da tabela: ",len(tabela_simbolos))
+    for x in range(len(tabela_simbolos)):
+        print("x: ",x)
+        print("itens: ",tabela_simbolos[x].cadeia)
+        if lex == tabela_simbolos[x].cadeia:
+            
+            print("são iguais")
+            return True
+        else:
+            print("pode gravar, não tem")
+            return False
 
 def proxToken():
     global tokens
@@ -225,9 +234,10 @@ def dc_p():
         return False
 
 def parametros():
-    global token, cat
+    global token, cat, escopo
     if "(" in token:
         cat = "param"
+        escopo = "local"
         token=proxToken()
         if lista_par():
             if ")" in token:
