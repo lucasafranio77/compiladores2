@@ -146,7 +146,7 @@ def lexico():
     
     saida.writelines(tokens)
 
-arquivo=open("entrada_errada.txt", "r")
+arquivo=open("entrada_certa.txt", "r")
 entrada=arquivo.read()
 
 saida=open("tokens.txt", "w")

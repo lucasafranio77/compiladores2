@@ -413,6 +413,8 @@ def mais_comandos():
         print("erro: está faltando o token ; na linha ",token[2])
         return True
 
+# TODO: quando não achar o $, tem que parar o código
+
 def comando():
     global token
     if "read" in token:

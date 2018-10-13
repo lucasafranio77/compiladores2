@@ -11,21 +11,21 @@ from types import SimpleNamespace
 # caso seja cat="param", insere os parametros e variaveis no ultimo proc
 
 class Atributos:
-    def __init__(self, cadeia, token, categoria, tipo, valor, linha, escopo, ):
-        self.cadeia = cadeia
-        self.token = token
-        self.categoria = categoria
-        self.tipo = tipo
-        self.valor = valor
-        self.linha = linha
-        self.escopo = escopo
+    def __init__(self, cadeia, token, categoria, tipo, valor, linha, escopo ):
+        self.cadeia = 'cadeia'
+        self.token = 'token'
+        self.categoria = 'categoria'
+        self.tipo = 'tipo'
+        self.valor = 'valor'
+        self.linha = 'linha'
+        self.escopo = 'escopo'
     
-    def __repr__(self):
-        return "[{}, {}, {}, {}, {}, {}, {}]".format(self.cadeia, self.token, self.categoria, self.tipo, self.valor, self.linha, self.escopo)
+    #def __repr__(self):
+     #   return "[{}, {}, {}, {}, {}, {}, {}]".format(self.cadeia, self.token, self.categoria, self.tipo, self.valor, self.linha, self.escopo)
 
-tabela_simbolos = list()
+tabela_simbolos = []
 cat = ""
-escopo = ""
+escopo = list()
 
 # insere variaveis na tabela de simbolos
 def insere_var(lex):
@@ -42,18 +42,20 @@ def insere_tipo(tipo, cont):
         cont -= 1
 
 def busca(lex):
+    
     global tabela_simbolos
-    print("tamanho da tabela: ",len(tabela_simbolos))
-    for x in range(len(tabela_simbolos)):
-        print("x: ",x)
-        print("itens: ",tabela_simbolos[x].cadeia)
-        if lex == tabela_simbolos[x].cadeia:
+    #print("tamanho da tabela: ",len(tabela_simbolos))
+    for tabela in tabela_simbolos:
+        print (tabela.cadeia)
+        #print("x: ",x)
+        #print("itens: ",x.cadeia)
+        #if lex == tabela_simbolos[x].cadeia:
             
-            print("são iguais")
-            return True
-        else:
-            print("pode gravar, não tem")
-            return False
+         #   print("são iguais")
+          #  return True
+        #else:
+         #   print("pode gravar, não tem")
+          #  return False
 
 def proxToken():
     global tokens
@@ -584,7 +586,6 @@ def outros_termos():
         else:
             return False
     else:
-        print("retornando vazio nos outros_termos")
         return True
 
 def op_ad():
@@ -596,6 +597,7 @@ def op_ad():
         token=proxToken()
         return True
     else:
+        print(token)
         print("erro no op_ad")
         print("erro: está faltando o token + ou - na linha ", token[2])
         return False

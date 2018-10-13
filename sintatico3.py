@@ -14,7 +14,6 @@ def S():
     global token
     if token:
         if programa():
-            print("\nParabéns programador, o seu código está sintaticamente correto!")
             return True
     else:
         return False
@@ -63,17 +62,23 @@ def corpo():
 
 def dc():
     global token
-    if dc_v():
-        if mais_dc():
-            return True
+    if "var" in token:
+        if dc_v():
+            if mais_dc():
+                return True
+            else:
+                return False
         else:
             return False
-    elif dc_p():
-        return True
-        if mais_dc():
+    elif 'procedure' in token:
+        if dc_p() :
+            return True
+            if mais_dc():
+                return True
+        else:
             return True
     else:
-        return True
+        return False
 
 def mais_dc():
     global token
@@ -97,13 +102,13 @@ def dc_v():
                     return True
                 else:
                     return False
-            else:
+            else:   
                 print("erro: está faltando o token : na linha ", token[2])
                 return False
         else:
             return False
     else:
-        print("erro: está faltando o token var na linha ", token[2])
+        print("erro: está faltando o token var na linha ", token)
         return False
 
 def tipo_var():
@@ -127,6 +132,7 @@ def variaveis():
         else:
             return False
     else:
+        print(token)
         print("erro: está faltando o token ident na linha ", token[2])
         return False
 
@@ -192,7 +198,7 @@ def lista_par():
             else:
                 return False
         else:
-            print("erro: está faltando o token : na linha ", token[2])
+            print("erro: está faltando no lista_par o token : na linha ", token[2])
             return False
     else:
         return False
@@ -232,9 +238,12 @@ def corpo_p():
 
 def dc_loc():
     global tokens
-    if dc_v():
-        if mais_dcloc():
-            return True
+    if "var" in token:
+        if dc_v():
+            if mais_dcloc():
+                return True
+            else:
+                return False
         else:
             return False
     else:
@@ -310,12 +319,6 @@ def comandos():
             return False
     else:
         return False
-
-# Foi add "erro: faltando token esperado" nos terminais da gramática
-
-# Porém nos vazios não foi colocado para printar o erro, pois poderia ser vazio
-
-# dificuldade de printar os erros dos comandos
 
 def mais_comandos():
     global token
@@ -497,16 +500,19 @@ def op_un():
 
 def outros_termos():
     global token
-    if op_ad():
-        if termo():
-            if outros_termos():
-                return True
+    if "+" in token or "-" in token:
+        if op_ad():
+            if termo():
+                if outros_termos():
+                    return True
+                else:
+                    return False
             else:
                 return False
         else:
             return False
     else:
-        print("retornando vazio nos outros_termos")
+        #print("retornando vazio nos outros_termos")
         return True
 
 def op_ad():
@@ -537,16 +543,19 @@ def termo():
 
 def mais_fatores():
     global token
-    if op_mul():
-        if fator():
-            if mais_fatores():
-                return True
+    if "*" in token or "/" in token:
+        if op_mul():
+            if fator():
+                if mais_fatores():
+                    return True
+                else:
+                    return False
             else:
                 return False
         else:
             return False
     else:
-        print("retornando vazio nos mais_fatores")
+        #print("retornando vazio nos mais_fatores")
         return True
 
 def op_mul():
@@ -590,12 +599,19 @@ def fator():
         print("erro: está faltando o token ( ou ident ou numero_int ou numero_real na linha ", token[2])
         return False
 
-token = proxToken()
-S()
+def sintatico():
+    global tokens, saida, linha,i
+    while i < len(tokens):
+        if ( S() or programa() or corpo() or dc() or mais_dc() or dc_v or tipo_var() or variaveis() or mais_var() or dc_p() or parametros() or lista_par() or mais_par() or corpo_p() or dc_loc() or mais_dcloc() or lista_arg() or argumentos() or mais_ident() or pfalsa() or comandos() or mais_comandos() or comando() or restoIdent() or condicao() or relacao() or expressao() or op_un() or outros_termos() or op_ad() or termo() or mais_fatores() or op_mul() or fator()) != True:
+            print("\nErro lexico !! na linha " + str(linha) + " no token " + str(pegartoken()) + "\n")
+            return False
+    print("\nParabéns programador, o seu código está sintaticamente correto!")
 
-'''
-if S():
-    print('O codigo está sintaticamente correto! \n Parabéns brow, programador dos bons ehin')
-else:
-    print('Não foi dessa vez, programador! \n Ta dando erro, vá corrigir programador')
-'''
+
+token = proxToken()
+
+i = 0
+
+sintatico()
+
+#S()
