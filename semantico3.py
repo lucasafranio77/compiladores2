@@ -353,6 +353,8 @@ def comando():
         token = proxToken()
         if "(" in token:
             token = proxToken()
+            print("print read",token)
+            busca_fator(token)
             if variaveis():
                 if ")" in token:
                     token = proxToken()
@@ -371,6 +373,8 @@ def comando():
         token = proxToken()
         if "(" in token:
             token = proxToken()
+            print("print write",token)
+            busca_fator(token)
             if variaveis():
                 if ")" in token:
                     token = proxToken()
@@ -431,6 +435,8 @@ def comando():
         else:
             return False
     elif "Identificador" in token:
+        print("print ident",token)
+        busca_fator(token)
         token = proxToken()
         if restoIdent():
             return True
@@ -586,14 +592,19 @@ def op_mul():
         return False
 
 def fator():
-    global token
+    global token, cat
     if "Identificador" in token:
+        busca_fator(token)
         token = proxToken()
         return True
     elif "NumeroInteiro" in token:
+        cat = "-"
+        insere_tabela(token,'integer')
         token = proxToken()
         return True
     elif "NumeroReal" in token:
+        cat = "-"
+        insere_tabela(token,'real')
         token = proxToken()
         return True
     elif "(" in token:
@@ -627,43 +638,13 @@ def sintatico():
 
 # caso seja cat="param", insere os parametros e variaveis no ultimo proc
 
-
 # TODO: arrumar essa busca - NÃO TA FUNFANDO
-
-'''def busca_tabela(lex):
-    global tabela_simbolos, proc, param, cat
-    print("printando o lex que to recebendo: ", lex)
-    if proc:
-        lex2 = lex
-        lex2[2] = 'parametro'
-        if param:
-            if lex in tabela_simbolos:
-                return True
-            else:
-                return False
-        else:
-            if lex in tabela_simbolos:
-                return True
-            elif lex2 in tabela_simbolos:
-                return True
-            else:
-                return False
-    else:
-        for lista in tabela_simbolos:
-            print('lista da busca', lista, " tamanho:", len(tabela_simbolos))
-            if lex in lista:
-                print("mostrando lex na busca: ", lex)
-                return True
-            else:
-                return False
-'''
 
 def busca_tabela(lex):
     global tabela_simbolos, proc, param, cat
     print("printando o lex que to recebendo: ", lex)
     if proc and param == False:
         for lista in tabela_simbolos:
-            print(lista)
             if lex[0] == lista[0] and lex[1] == lista[1] and lex[2] == lista[2]:
                 print('ta comparando proc na busca')
                 return True
@@ -673,6 +654,13 @@ def busca_tabela(lex):
                 print('ta comparando na busca')
                 return True
 
+def busca_fator(lex):
+    global tabela_simbolos
+    print("printando o lex que to recebendo busca_fator: ", lex)
+    for lista in tabela_simbolos:
+        if lex[0] == lista[0] and lex[1] == lista[1] and lista[2] == "var" or lista[2] == "proc":
+            print('ok com a ident no fator')
+            return True
 
 def insere_tabela(lex,tipo):
     global tabela_simbolos,cat,var_aux, proc, param
@@ -680,6 +668,28 @@ def insere_tabela(lex,tipo):
     # este é o caso que salva o nome do programa
     if cat == "nome_prog":
         tabela_simbolos.append([lex[0],lex[1], cat, '-', '-', lex[2],"global"])
+    # este é o caso que salva os numeros
+    elif cat == "-":
+        if proc:
+            if lex[1] == "NumeroInteiro":
+                tabela_simbolos.append([lex[0],lex[1], cat, tipo, int(lex[0]), lex[2],"local"])
+                print("to salvando num inteiro local")
+            elif lex[1] == "NumeroReal":
+                tabela_simbolos.append([lex[0],lex[1], cat, tipo, float(lex[0]), lex[2],"local"])
+                print("to salvando num real local")
+            else:
+                print("erro na salvação dos numeros no local")
+                return False
+        else:
+            if lex[1] == "NumeroInteiro":
+                tabela_simbolos.append([lex[0],lex[1], cat, tipo, int(lex[0]), lex[2],"global"])
+                print("to salvando num inteiro global")
+            elif lex[1] == "NumeroReal":
+                tabela_simbolos.append([lex[0],lex[1], cat, tipo, float(lex[0]), lex[2],"global"])
+                print("to salvando num real global")
+            else:
+                print("erro na salvação dos numeros no global")
+                return False
     # este caso é só para os parametros
     elif param:
         for lex in var_aux:
