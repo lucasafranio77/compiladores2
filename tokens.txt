@@ -5,8 +5,6 @@ a Identificador 3
 , SimbolosSimples 3 
 a1 Identificador 3 
 , SimbolosSimples 3 
-a1 Identificador 3 
-, SimbolosSimples 3 
 b Identificador 3 
 : SimbolosSimples 3 
 integer Identificador 3 

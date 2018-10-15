@@ -186,7 +186,6 @@ def dc_p():
 def parametros():
     global token, param, cat
     if "(" in token:
-        print("parametros:",token)
         token = proxToken()
         param = True
         if lista_par():
@@ -529,7 +528,6 @@ def outros_termos():
         else:
             return False
     else:
-        #print("retornando vazio nos outros_termos")
         return True
 
 def op_ad():
@@ -572,7 +570,6 @@ def mais_fatores():
         else:
             return False
     else:
-        #print("retornando vazio nos mais_fatores")
         return True
 
 def op_mul():
@@ -631,9 +628,11 @@ def sintatico():
 # caso seja cat="param", insere os parametros e variaveis no ultimo proc
 
 
-# TODO: ver melhor essa busca aqui
-def busca_tabela(lex):
-    global tabela_simbolos, proc
+# TODO: arrumar essa busca - NÃO TA FUNFANDO
+
+'''def busca_tabela(lex):
+    global tabela_simbolos, proc, param, cat
+    print("printando o lex que to recebendo: ", lex)
     if proc:
         lex2 = lex
         lex2[2] = 'parametro'
@@ -651,21 +650,40 @@ def busca_tabela(lex):
                 return False
     else:
         for lista in tabela_simbolos:
+            print('lista da busca', lista, " tamanho:", len(tabela_simbolos))
             if lex in lista:
                 print("mostrando lex na busca: ", lex)
                 return True
             else:
                 return False
+'''
+
+def busca_tabela(lex):
+    global tabela_simbolos, proc, param, cat
+    print("printando o lex que to recebendo: ", lex)
+    if proc and param == False:
+        for lista in tabela_simbolos:
+            print(lista)
+            if lex[0] == lista[0] and lex[1] == lista[1] and lex[2] == lista[2]:
+                print('ta comparando proc na busca')
+                return True
+    else:
+        for lista in tabela_simbolos:
+            if lex[0] == lista[0] and lex[1] == lista[1] and lex[2] == lista[2] and lex[3] == lista[3] and lex[4] == lista[5]:
+                print('ta comparando na busca')
+                return True
+
 
 def insere_tabela(lex,tipo):
-    global tabela_simbolos,cat,var_aux
+    global tabela_simbolos,cat,var_aux, proc, param
     print("proc: ", proc, "param: ", param, "token: ", lex, " cat: ", cat)
+    # este é o caso que salva o nome do programa
     if cat == "nome_prog":
         tabela_simbolos.append([lex[0],lex[1], cat, '-', '-', lex[2],"global"])
     # este caso é só para os parametros
     elif param:
         for lex in var_aux:
-            if not busca_tabela([lex,cat,tipo]):
+            if not busca_tabela([lex[0],lex[1],cat,tipo,lex[2]]):
                 tabela_simbolos.append([lex[0],lex[1], cat, tipo, '-', lex[2],"local"])
                 print("to salvando param local")
             else:
@@ -674,7 +692,8 @@ def insere_tabela(lex,tipo):
     # este caso é só para variaveis locais
     elif proc and param == False and cat == "var":
         for lex in var_aux:
-            if not busca_tabela([lex,cat,tipo]):
+            if not busca_tabela([lex[0],lex[1],cat,tipo,lex[2]]):
+                #tabela_simbolos[len(tabela_simbolos)-1].append([lex[0],lex[1], cat, '-', '-', lex[2],"local"])
                 tabela_simbolos.append([lex[0],lex[1], cat, '-', '-', lex[2],"local"])
                 print("to salvando variavel local da procedure")
             else:
@@ -682,8 +701,7 @@ def insere_tabela(lex,tipo):
                 return  False
     # este caso é só para a procedure
     elif proc and param == False:
-        if not busca_tabela([lex,cat,tipo]):
-            # FIXME: atualizar categoria para PROC, está VAR
+        if not busca_tabela([lex[0],lex[1],cat,tipo,lex[2]]):
             tabela_simbolos.append([lex[0],lex[1], cat, '-', '-', lex[2],"global"])
             print("to salvando proc")
         else:
