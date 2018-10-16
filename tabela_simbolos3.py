@@ -114,7 +114,7 @@ def dc_v():
         return False
 
 def tipo_var():
-    global token, var_aux, cat, param
+    global token, var_aux, cat
     if "real" in token:
         insere_tabela(var_aux,tipo='real')
         var_aux = []

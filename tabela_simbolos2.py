@@ -115,6 +115,10 @@ def dc_v():
 
 def tipo_var():
     global token, var_aux, cat, param
+    if param:
+        cat = "param"
+    else:
+        cat = "var"
     if "real" in token:
         insere_tabela(var_aux,tipo='real')
         var_aux = []
@@ -182,7 +186,6 @@ def dc_p():
 def parametros():
     global token, param, cat
     if "(" in token:
-        cat = "param"
         token = proxToken()
         param = True
         if lista_par():
@@ -292,7 +295,7 @@ def lista_arg():
 def argumentos():
     global token
     if "Identificador" in token:
-        #busca_fator(token)
+        busca_fator(token)
         token = proxToken()
         if mais_ident():
             return True
@@ -352,6 +355,8 @@ def comando():
         token = proxToken()
         if "(" in token:
             token = proxToken()
+            print("print read",token)
+            busca_fator(token)
             if variaveis():
                 if ")" in token:
                     token = proxToken()
@@ -370,6 +375,8 @@ def comando():
         token = proxToken()
         if "(" in token:
             token = proxToken()
+            print("print write",token)
+            busca_fator(token)
             if variaveis():
                 if ")" in token:
                     token = proxToken()
@@ -430,6 +437,8 @@ def comando():
         else:
             return False
     elif "Identificador" in token:
+        print("print ident",token)
+        busca_fator(token)
         token = proxToken()
         if restoIdent():
             return True
@@ -587,6 +596,7 @@ def op_mul():
 def fator():
     global token, cat
     if "Identificador" in token:
+        busca_fator(token)
         token = proxToken()
         return True
     elif "NumeroInteiro" in token:
@@ -622,8 +632,8 @@ def fator():
         if ( S() or programa() or corpo() or dc() or mais_dc() or dc_v or tipo_var() or variaveis() or mais_var() or dc_p() or parametros() or lista_par() or mais_par() or corpo_p() or dc_loc() or mais_dcloc() or lista_arg() or argumentos() or mais_ident() or pfalsa() or comandos() or mais_comandos() or comando() or restoIdent() or condicao() or relacao() or expressao() or op_un() or outros_termos() or op_ad() or termo() or mais_fatores() or op_mul() or fator()) != True:
             print("\nErro sintatico !! na linha " + str(token[2]) + " no token " + str(token[0]) + "\n")
             return False
-    print("Parabéns programador, o seu código está sintaticamente correto!\n")'''
-
+    print("Parabéns programador, o seu código está sintaticamente correto!\n")
+'''
 
 # A tabela de simbolos
 # [cadeia, token, categoria, valor, linha, tipo]
@@ -632,7 +642,7 @@ def fator():
 
 # TODO: arrumar essa busca - NÃO TA FUNFANDO
 
-'''def busca_tabela(lex):
+def busca_tabela(lex):
     global tabela_simbolos, proc, param, cat
     #print("printando o lex que to recebendo: ", lex)
     if proc and param == False:
@@ -644,37 +654,34 @@ def fator():
         for lista in tabela_simbolos:
             if lex[0] == lista[0] and lex[1] == lista[1] and lex[2] == lista[2] and lex[3] == lista[3] and lex[4] == lista[5]:
                 print('ta comparando na busca')
-                return True'''
+                return True
 
-'''def busca_fator(lex):
-    global tabela_simbolos, proc
+def busca_fator(lex):
+    global tabela_simbolos
     print("printando o lex que to recebendo busca_fator: ", lex)
     for lista in tabela_simbolos:
-        if lex[0] == lista[0]:
-            tipo = lista[5]
-        if lista[2] == "proc":
-            for item in lista[5]:
-                print(tipo)
-                print(item)
-                print(item[5])
-                if tipo == item[5] and item[2] == "param":
-                    print("o tipo deste parametro é igual")
-                    return True
-                else:
-                    print("o tipo deste parametro não é compativel")'''
+        if lex[0] == lista[0] and lex[1] == lista[1] and lista[2] == "var" or lista[2] == "proc" or lista[2] == "param":
+            print('ok com a ident no fator')
+            return True
+        #print("identificador não declarado")
 
 def busca_escopo(lex):
-    global tabela_simbolos
-    print("to recebendo o lex na busca_escopo: ", lex)
-    for lista in tabela_simbolos[len(tabela_simbolos) - 1][5]:
-        if lex[0] == lista[0]:
-            print("tem parametro igual no proc")
-            return True
+    global tabela_simbolos, proc, param, pos_proc
+    if proc:
+        for lista in tabela_simbolos:
+            if lista[2] == "proc":
+                print("to achando proc")
+                pos_proc = search(tabela_simbolos, lista[0])
+                for item in lista[5]:
+                    print(item)
+                    if lex[0] == item[0]:
+                        print("tem parametro igual no proc")
+                        return True
 
 def busca_global(lex):
-    global tabela_simbolos
+    global tabela_simbolos, indice
     for lista in tabela_simbolos:
-        if lex[0] == lista[0] and lex[1] == lista[1] and lex[2] == lista[2] and lex[3] == lista[5]:
+        if lex[0] == lista[0] and lex[1] == lista[1] and lex[2] == lista[2] and lex[3] == lista[3] and lex[4] == lista[5]:
             print('ta comparando na busca')
             return True
 
@@ -682,7 +689,7 @@ def search (lista, valor):
     return [(lista.index(x), x.index(valor)) for x in lista if valor in x]
 
 def insere_tabela(lex,tipo):
-    global tabela_simbolos,cat,var_aux, proc, param
+    global tabela_simbolos,cat,var_aux, proc, param, pos_proc
     print("proc: ", proc, "param: ", param, "token: ", lex, " cat: ", cat)
     # este é o caso que salva o nome do programa
     if cat == "nome_prog":
@@ -716,43 +723,49 @@ def insere_tabela(lex,tipo):
                 tabela_simbolos[len(tabela_simbolos)-1][5].append([lex[0],lex[1], cat, '-', lex[2], tipo])
                 print("to salvando param local")
             else:
-                print("Erro: essa variavel já foi declarada => ", lex[0], " , na linha: ", lex[2])
+                print("Erro: variavel já foi declarada")
                 return  False
     # este caso é só para variaveis locais
     elif proc and param == False and cat == "var": #busco local e depois busco global
         for lex in var_aux:
             if not busca_escopo([lex[0],lex[1],cat,tipo,lex[2]]):
-                tabela_simbolos[len(tabela_simbolos)-1][5].append([lex[0],lex[1], cat, '-', lex[2], tipo])
+                tabela_simbolos[len(tabela_simbolos)-1][5].append([lex[0],lex[1], cat, '-', lex[2], '-'])
                 print("to salvando variavel local da procedure")
             else:
-                print("Erro: essa variavel já foi declarada => ", lex[0], " , na linha: ", lex[2])
+                print("Erro: variavel já foi declarada")
                 return  False
     # este caso é só para a procedure
     elif proc and param == False:
         if not busca_global([lex[0],lex[1],cat,tipo,lex[2]]): #busca global
+            print("posicao de ",lex[0]," é: ",search(tabela_simbolos, lex[0]))
             tabela_simbolos.append([lex[0],lex[1], cat, '-', lex[2], []])
             print("to salvando proc")
         else:
-            print("Erro: essa variavel já foi declarada => ", lex[0], " , na linha: ", lex[2])
+            print("Erro: variavel já foi declarada")
             return  False
     else:
         for lex in var_aux:
+            print("posicao de ",lex[0]," é: ",search(tabela_simbolos, lex[0]))
             if not busca_global([lex[0],lex[1],cat,tipo,lex[2]]): # busca global
                 tabela_simbolos.append([lex[0],lex[1], cat, '-', lex[2], tipo])
                 print("to salvando global")
             else:
-                print("Erro: essa variavel já foi declarada => ", lex[0], " , na linha: ", lex[2])
+                print("Erro: variavel já foi declarada")
                 return  False
     print('\n------- Tabela de Simbolos ------- \n # [cadeia, token, categoria, valor, linha, tipo]\n\n', tabela_simbolos,'\n')
+
 
 
 token = proxToken()
 i = 0
 tabela_simbolos = []
+
 cat = ''
 param = False
 proc = False
 var_aux = []
+pos_proc = []
+
 
 #sintatico()
 S()

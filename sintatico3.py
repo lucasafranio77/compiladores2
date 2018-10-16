@@ -72,7 +72,6 @@ def dc():
             return False
     elif 'procedure' in token:
         if dc_p() :
-            return True
             if mais_dc():
                 return True
         else:
@@ -599,16 +598,16 @@ def fator():
         print("erro: está faltando o token ( ou ident ou numero_int ou numero_real na linha ", token[2])
         return False
 
-def sintatico():
+'''def sintatico():
     global tokens, i
     while i < len(tokens):
         if ( S() or programa() or corpo() or dc() or mais_dc() or dc_v or tipo_var() or variaveis() or mais_var() or dc_p() or parametros() or lista_par() or mais_par() or corpo_p() or dc_loc() or mais_dcloc() or lista_arg() or argumentos() or mais_ident() or pfalsa() or comandos() or mais_comandos() or comando() or restoIdent() or condicao() or relacao() or expressao() or op_un() or outros_termos() or op_ad() or termo() or mais_fatores() or op_mul() or fator()) != True:
-            print("\nErro sintatico !! na linha " + str(token[2]) + " no token " + str(token[0]) + "\n")
+            print("\nSeu codigo está com erro sintatico \n")
             return False
     print("Parabéns programador, o seu código está sintaticamente correto!\n")
-
+'''
 
 token = proxToken()
 i = 0
-sintatico()
-#S()
+#sintatico()
+S()
