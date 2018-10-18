@@ -357,7 +357,7 @@ def mais_comandos():
         return True
 
 def comando():
-    global token, nome_proc, sinal_comando
+    global token, nome_proc, sinal_comando, tipo_aux
     if "read" in token:
         sinal_comando = True
         token = proxToken()
@@ -379,10 +379,12 @@ def comando():
             print("erro: está faltando o token ( na linha ", token[2])
             return False
     elif "write" in token:
+        sinal_comando = True
         token = proxToken()
         if "(" in token:
             token = proxToken()
             if variaveis():
+                sinal_comando = False
                 if ")" in token:
                     token = proxToken()
                     return True
@@ -444,6 +446,8 @@ def comando():
     elif "Identificador" in token:
         if busca_ident(token):
             nome_proc = token[0]
+        else:
+            tipo_aux = busca_tipo(token)
         token = proxToken()
         if restoIdent():
             return True
@@ -455,10 +459,12 @@ def comando():
         return False
 
 def restoIdent():
-    global token
+    global token, express
     if ":=" in token:
+        express = True
         token = proxToken()
         if expressao():
+            express = False
             return True
         else:
             return False
@@ -599,20 +605,46 @@ def op_mul():
         return False
 
 def fator():
-    global token, cat
+    global token, cat, express, tipo_aux
     if "Identificador" in token:
-        token = proxToken()
-        return True
+        if express:
+            tipo_aux2 = busca_tipo(token)
+            if tipo_aux == tipo_aux2:
+                token = proxToken()
+                print("operação pode ocorrer, pois as variaveis são compativeis")
+                return True
+            else:
+                print("erro: operação com tipos diferentes")
+                return False
+        else:
+            token = proxToken()
+            return True
     elif "NumeroInteiro" in token:
         cat = "-"
         insere_tabela(token,'integer')
-        token = proxToken()
-        return True
+        if express:
+            if tipo_aux == "integer":
+                token = proxToken()
+                return True
+            else:
+                print("erro: operação com tipos diferentes")
+                return False
+        else:
+            token = proxToken()
+            return True
     elif "NumeroReal" in token:
         cat = "-"
         insere_tabela(token,'real')
-        token = proxToken()
-        return True
+        if express:
+            if tipo_aux == "real":
+                token = proxToken()
+                return True
+            else:
+                print("erro: operação com tipos diferentes")
+                return False
+        else:
+            token = proxToken()
+            return True
     elif "(" in token:
         token = proxToken()
         if expressao():
@@ -630,47 +662,6 @@ def fator():
         print("erro: está faltando o token ( ou ident ou numero_int ou numero_real na linha ", token[2])
         return False
 
-'''def sintatico():
-    global tokens, i
-    while i < len(tokens):
-        if ( S() or programa() or corpo() or dc() or mais_dc() or dc_v or tipo_var() or variaveis() or mais_var() or dc_p() or parametros() or lista_par() or mais_par() or corpo_p() or dc_loc() or mais_dcloc() or lista_arg() or argumentos() or mais_ident() or pfalsa() or comandos() or mais_comandos() or comando() or restoIdent() or condicao() or relacao() or expressao() or op_un() or outros_termos() or op_ad() or termo() or mais_fatores() or op_mul() or fator()) != True:
-            print("\nErro sintatico !! na linha " + str(token[2]) + " no token " + str(token[0]) + "\n")
-            return False
-    print("Parabéns programador, o seu código está sintaticamente correto!\n")'''
-
-
-
-'''def busca_tabela(lex):
-    global tabela_simbolos, proc, param, cat
-    #print("printando o lex que to recebendo: ", lex)
-    if proc and param == False:
-        for lista in tabela_simbolos:
-            if lex[0] == lista[0] and lex[1] == lista[1] and lex[2] == lista[2]:
-                print('ta comparando proc na busca')
-                return True
-    else:
-        for lista in tabela_simbolos:
-            if lex[0] == lista[0] and lex[1] == lista[1] and lex[2] == lista[2] and lex[3] == lista[3] and lex[4] == lista[5]:
-                print('ta comparando na busca')
-                return True'''
-
-'''def busca_fator(lex):
-    global tabela_simbolos, proc
-    print("printando o lex que to recebendo busca_fator: ", lex)
-    for lista in tabela_simbolos:
-        if lex[0] == lista[0]:
-            tipo = lista[5]
-        if lista[2] == "proc":
-            for item in lista[5]:
-                print(tipo)
-                print(item)
-                print(item[5])
-                if tipo == item[5] and item[2] == "param":
-                    print("o tipo deste parametro é igual")
-                    return True
-                else:
-                    print("o tipo deste parametro não é compativel")'''
-
 '''def search (lista, valor):
     return [(lista.index(x), x.index(valor)) for x in lista if valor in x]
 '''
@@ -682,12 +673,6 @@ def busca_arg(lex):
     for lista in tabela_simbolos:
         if lex[0] in lista and lista[2] == "var":
             return lista[5]
-        '''elif nome_proc == lista[0] and lista[2] == "proc":
-            pos = tabela_simbolos.index(lista)
-            for item in lista[pos]:
-                if lex[0] == item[0]:
-                    print ("o tipo é esse aqui: ", item[5])
-                    return item[5]'''
             
 def busca_ident(lex):
     global tabela_simbolos, nome_proc
@@ -700,29 +685,52 @@ def busca_parametros():
     lista_parametros = []
     for lista in tabela_simbolos:
         if nome_proc == lista[0] and lista[2] == "proc":
-            pos = tabela_simbolos.index(lista)
-            for item in lista[pos]:
+            for item in lista[5]:
                 if item[2] == 'param':
                     lista_parametros.append(item[5])
             return lista_parametros
 
 def busca_variaveis(lex):
     global tabela_simbolos, proc
-    print("busca_variaveis: ",lex)
     if proc:
-        for lista in tabela_simbolos:
-            if lista[2] == "proc":
-                pos = tabela_simbolos.index(lista)
-                for item in lista[pos]:
-                    if item[0] == lista[0] and item[2] == "var":
-                        print("encontrada essa variavel no escopo local")
-
-        
-'''        for lista in tabela_simbolos[len(tabela_simbolos) - 1][5]:
+        for lista in tabela_simbolos[len(tabela_simbolos) - 1][5]:
             if lex[0] == lista[0] and lista[2] == "var":
                 print("encontrada essa variavel no escopo local")
-                return True'''
+                return True
+        for lista in tabela_simbolos:
+            if lex[0] in lista:
+                print("encontrada essa variavel no escopo global")
+                return True
+        print("erro: variavel em escopo errado ou não foi declarada")
+        return False
+    else:
+        for lista in tabela_simbolos:
+            if lex[0] in lista:
+                print("encontrada essa variavel no escopo global")
+                return True
+        print("erro: variavel em escopo errado ou não foi declarada")
+        return False    
 
+def busca_tipo(lex):
+    global tabela_simbolos
+    if proc:
+        for lista in tabela_simbolos[len(tabela_simbolos) - 1][5]:
+            if lex[0] == lista[0] and lista[2] == "var":
+                print("encontrada essa variavel no escopo local")
+                return lista[5]
+        for lista in tabela_simbolos:
+            if lex[0] == lista[0]:
+                print("encontrada essa variavel no escopo global dentro")
+                return tabela_simbolos[tabela_simbolos.index(lista)][5]
+        print("erro: variavel em escopo errado ou não foi declarada")
+        return False
+    else:
+        for lista in tabela_simbolos:
+            if lex[0] == lista[0]:
+                print("encontrada essa variavel no escopo global2")
+                return lista[5]
+        print("erro: variavel em escopo errado ou não foi declarada")
+        return False    
 
 # A tabela de simbolos
 # [cadeia, token, categoria, valor, linha, tipo]
@@ -731,11 +739,9 @@ def busca_variaveis(lex):
 
 def busca_escopo(lex):
     global tabela_simbolos
-    print("to recebendo o lex na busca_escopo: ", lex)
     for lista in tabela_simbolos[len(tabela_simbolos) - 1][5]:
         if lex[0] == lista[0]:
             print("tem parametro igual no proc")
-            print(lex)
             return True
 
 def busca_global(lex):
@@ -747,7 +753,6 @@ def busca_global(lex):
 
 def insere_tabela(lex,tipo):
     global tabela_simbolos,cat,var_aux, proc, param
-    print("proc: ", proc, "param: ", param, "token: ", lex, " cat: ", cat)
     # este é o caso que salva o nome do programa
     if cat == "nome_prog":
         tabela_simbolos.append([lex[0],lex[1], cat, '-', lex[2] ,""])
@@ -822,6 +827,8 @@ lista_tipos = []
 nome_proc = ""
 
 sinal_comando = False
+express = False
+tipo_aux = ""
 
 #sintatico()
 S()

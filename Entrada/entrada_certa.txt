@@ -1,16 +1,17 @@
 program programa1
 {1 exemplo de programa}
-var a, a1, b, a: integer;
-var c: real;
+var a, a1, c, a: integer;
+var b,b1: real;
 procedure soma(a:integer; b:integer)
 /* esta eh uma subrotina *** */
-	var c: integer;
+	var d: integer;
 	begin
-			read(c);
+			read(d);
     		if a > b then 
 			c:= 3 + a
     		$;
-    		b := 4.3
+    		b := 4.3;
+			d := 5
 	end;
 procedure sub(a:integer; b:real; b:real)
 /* esta eh uma subrotina *** */
@@ -23,15 +24,15 @@ procedure sub(a:integer; b:real; b:real)
 	end
 begin
     read(a);
-    a1:= a1 * 2.3444;
+    b1:= b1 * 2.3444;
     while a1>0 do
         write(a1);
         a1:=a1-1
     $;
     while b <> 10 do
-        b:=b+2;
+        a1:=a1+2;
         a:=a-1;
-        b:=b+1
+        c:=c+1
     $;
-    soma(a1;b)
+    soma(a1;c)
 end.
